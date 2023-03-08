@@ -1,5 +1,32 @@
 # 【基础知识】
 
+### 二叉树
+
+**1、二叉树的这种类**
+
+- 满二叉树
+- 完全二叉树
+- 二叉搜索树
+- 平衡二叉搜索树
+
+**2、存储方式**
+
+- 链式存储
+- 线性存储
+
+**3、遍历方式**
+
+- 深度优先搜索（递归）
+  - 前序遍历
+  - 中序遍历
+  - 后序遍历
+- 广度优先遍历
+  - 层序遍历（队列Queue）
+
+**4、定义方式**
+
+
+
 ### 背包问题基础
 
 **01 背包 & 完全背包**
@@ -80,9 +107,71 @@ for (int i = 0; i < nums.length; i++){// 物品
 }
 ```
 
+**完全背包**
 
+> 一维数组的含义
+>
+> 递推公式
+>
+> dp 数组初始化
+>
+> 遍历顺序
 
 # 【LeetCode】
+
+### 【动态规划、数组】53.最大子数组和
+
+[题目链接](https://leetcode.cn/problems/maximum-subarray/description/)
+
+难度：中等
+
+```java
+class Solution {
+    public int maxSubArray(int[] nums) {
+        int nowSum = 0, agoSum = Integer.MIN_VALUE;
+
+        for (int i = 0; i < nums.length; i++){
+            
+            nowSum += nums[i];
+
+            if (nowSum > agoSum){
+                agoSum = nowSum;
+            }
+            if (nowSum < 0){
+                nowSum = 0;
+            }
+        }
+
+        return agoSum;
+    }
+}
+```
+
+```java
+// 动态规划解法
+class Solution {
+    public int maxSubArray(int[] nums) {
+        
+        int len = nums.length;
+        int[] dp = new int[len];
+        dp[0] = nums[0];
+
+        for (int i = 1; i < len; i++){
+            dp[i] = Math.max(nums[i], dp[i - 1] + nums[i]);
+        }
+
+        int res = Integer.MIN_VALUE;
+        for (int i : dp){
+            System.out.print(i + " ");
+            res = Math.max(res, i);
+        }
+
+        return res;
+    }
+}
+```
+
+
 
 ### 【动态规划】62.不同路径
 
@@ -184,6 +273,98 @@ class Solution {
 }
 ```
 
+### 【二叉树】94.二叉树的中序遍历
+
+[题目链接](https://leetcode.cn/problems/binary-tree-inorder-traversal/description/)
+
+难度：简单
+
+```java
+// 递归遍历
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+
+    private List<Integer> list;
+
+    public List<Integer> inorderTraversal(TreeNode root) {
+        list = new LinkedList<>();
+        if (root == null) {
+            return list;
+        }
+        preorder(root);
+        return list;
+    }
+
+    public void preorder(TreeNode root){
+        if (root ==null){
+            return;
+        }
+        preorder(root.left);
+        list.add(root.val);
+        preorder(root.right);
+    }
+}
+```
+
+```java
+// 非递归遍历
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public List<Integer> inorderTraversal(TreeNode root) {
+
+        Stack<TreeNode> stack = new Stack<>();
+        List<Integer> list = new LinkedList<>();
+
+        TreeNode temp = root;
+
+        if (temp == null) {
+            return list;
+        }
+
+        while (temp != null || !stack.empty()) {
+            if (temp != null) {
+                stack.push(temp);
+                temp = temp.left;
+            }else {
+                temp = stack.pop();
+                list.add(temp.val);
+                temp = temp.right;
+            }
+        }
+
+        return list;
+    }
+}
+```
+
 
 
 ### 【动态规划】96.不同的二叉搜索树
@@ -211,6 +392,374 @@ class Solution {
         }
 
         return dp[n];
+    }
+}
+```
+
+
+
+### 【二叉树】102.二叉树的层序遍历
+
+[题目链接](https://leetcode.cn/problems/binary-tree-level-order-traversal/description/)
+
+难度：简单
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+
+    List<Integer> list;
+
+    public List<List<Integer>> levelOrder(TreeNode root) {
+
+        List<List<Integer>> res = new LinkedList<>();
+        Queue<TreeNode> queue = new LinkedList<>();
+
+        if (root == null){
+            return res;
+        }
+        queue.offer(root);
+
+        while (!queue.isEmpty()) {
+            
+            list = new LinkedList<>();
+            int size = queue.size();
+
+            for (int i = 0; i < size; i++) {
+
+                TreeNode temp = queue.poll();
+                list.add(temp.val);
+
+                if (temp.left != null) {
+                    queue.offer(temp.left);
+                }
+                if (temp.right != null) {
+                    queue.offer(temp.right);
+                }
+            }
+
+            res.add(new LinkedList<>(list));
+        }
+
+        return res;
+    }
+}
+```
+
+
+
+### 【二叉树】107.二叉树的层序遍历ii
+
+[题目链接](https://leetcode.cn/problems/binary-tree-level-order-traversal-ii/description/)
+
+难度：中等
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+
+    List<Integer> list;
+
+    public List<List<Integer>> levelOrderBottom(TreeNode root) {
+        
+        List<List<Integer>> res = new LinkedList<>();
+        Queue<TreeNode> queue = new LinkedList<>();
+        List<List<Integer>> res1 = new LinkedList<>();
+
+        if (root == null) {
+            return res;
+        }
+        queue.offer(root);
+
+        while (!queue.isEmpty()) {
+
+            list = new LinkedList<>();
+            int size = queue.size();
+
+            for (int i = 0; i < size; i++) {
+
+                TreeNode tempNode = queue.poll();
+                list.add(tempNode.val);
+                if (tempNode.left != null) {
+                    queue.offer(tempNode.left);
+                }
+                if (tempNode.right != null) {
+                    queue.offer(tempNode.right);
+                }
+            }
+
+            res.add(new LinkedList<>(list));
+        }
+
+        for (int i = res.size() - 1; i >= 0; i--){
+            res1.add(res.get(i));
+        }
+
+        return res1;
+    }
+}
+```
+
+
+
+### 【二叉树】144.二叉树的前序遍历
+
+[题目链接](https://leetcode.cn/problems/binary-tree-preorder-traversal/description/)
+
+难度：简单
+
+```java
+// 递归遍历
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+
+    private List<Integer> list;
+
+    public List<Integer> preorderTraversal(TreeNode root) {
+        list = new LinkedList<>();
+        if (root == null) {
+            return list;
+        }
+        preorder(root);
+        return list;
+    }
+
+    public void preorder(TreeNode root){
+        if (root ==null){
+            return;
+        }
+        list.add(root.val);
+        preorder(root.left);
+        preorder(root.right);
+    }
+}
+```
+
+```java
+// 非递归遍历
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public List<Integer> preorderTraversal(TreeNode root) {
+
+        Stack<TreeNode> stack = new Stack<>();
+        List<Integer> list = new LinkedList<>();
+
+        if (root == null) {
+            return list;
+        }
+
+        stack.push(root);
+
+        while (!stack.empty()){
+            
+            TreeNode temp = stack.pop();
+            list.add(temp.val);
+
+            if (temp.right != null) stack.push(temp.right);
+            if (temp.left != null) stack.push(temp.left);
+
+        }
+
+        return list;
+
+    }
+}
+```
+
+
+
+### 【二叉树】145.二叉树的后序遍历
+
+[题目链接](https://leetcode.cn/problems/binary-tree-postorder-traversal/description/)
+
+难度：简单
+
+```java
+// 递归遍历
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+
+    private List<Integer> list;
+
+    public List<Integer> postorderTraversal(TreeNode root) {
+        list = new LinkedList<>();
+        if (root == null) {
+            return list;
+        }
+        preorder(root);
+        return list;
+    }
+
+    public void preorder(TreeNode root){
+        if (root ==null){
+            return;
+        }
+        preorder(root.left);
+        preorder(root.right);
+        list.add(root.val);
+    }
+
+}
+```
+
+```java
+// 非递归遍历
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public List<Integer> postorderTraversal(TreeNode root) {
+
+        Stack<TreeNode> stack = new Stack<>();
+        List<Integer> list = new LinkedList<>();
+        List<Integer> res = new LinkedList<>();
+
+        if (root == null) {
+            return list;
+        }
+
+        stack.push(root);
+
+        while (!stack.empty()) {
+
+            TreeNode temp = stack.pop();
+            list.add(temp.val);
+
+            if (temp.left != null) stack.push(temp.left);
+            if (temp.right != null) stack.push(temp.right);
+
+        }
+
+        for (int i = list.size() - 1; i >= 0; i--){
+            res.add(list.get(i));
+        }
+
+        return res;
+
+    }
+}
+```
+
+
+
+### 【动态规划】152.乘积最大子数组
+
+[题目链接](https://leetcode.cn/problems/maximum-product-subarray/description/)
+
+难度：中等
+
+```java
+class Solution {
+    public int maxProduct(int[] nums) {
+
+        int len = nums.length;
+
+        int[] dp1 = new int[len];
+        int[] dp2 = new int[len];
+        dp1[0] = nums[0];
+        dp2[0] = nums[0];
+
+        for (int i = 1; i < len; i++){
+            dp1[i] = minValue(dp1[i - 1] * nums[i], dp2[i - 1] * nums[i], nums[i]);
+            dp2[i] = maxValue(dp1[i - 1] * nums[i], dp2[i - 1] * nums[i], nums[i]);
+        }
+
+        int res = Integer.MIN_VALUE;
+        for (int i : dp2){
+            res = Math.max(res, i);
+        }
+
+        return res;
+    }
+
+    private int minValue(int a1, int a2, int a3){
+        return Math.min(a1, Math.min(a2, a3));
+    }
+
+    private int maxValue(int a1, int a2, int a3){
+        return Math.max(a1, Math.max(a2, a3));
     }
 }
 ```
@@ -387,6 +936,32 @@ class Solution {
 
 
 
+### 【背包问题】518.零钱兑换ii
+
+[题目链接](https://leetcode.cn/problems/coin-change-ii/description/)
+
+难度：中等
+
+```java
+class Solution {
+    public int change(int amount, int[] coins) {
+
+        int[] dp = new int[amount + 1];
+        dp[0] = 1;
+
+        for (int i = 0; i < coins.length; i++){
+            for (int j = coins[i]; j <= amount; j++){
+                dp[j] += dp[j - coins[i]];
+            }
+        }
+
+        return dp[amount];
+    }
+}
+```
+
+
+
 ### 【动态规划】746.使用最小花费爬楼梯
 
 链接：https://leetcode.cn/problems/min-cost-climbing-stairs/description/
@@ -409,7 +984,7 @@ class Solution {
 }
 ```
 
-### 【动态规划、背包问题】1049.最后一块石头的重量 ii
+### 【背包】1049.最后一块石头的重量 ii
 
 [题目链接](https://leetcode.cn/problems/last-stone-weight-ii/description/)
 
